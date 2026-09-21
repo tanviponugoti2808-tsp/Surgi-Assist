@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Surgery List - SurgiAssist</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header><h1>SurgiAssist</h1></header>
+  <div class="container">
+    <div class="section">
+      <h2>Surgery Names</h2>
+      <input type="text" id="searchInput" placeholder="Search for a surgery...">
+      <table id="surgeryTable">
+        <thead><tr><th>Surgeries List</th></tr></thead>
+        <tbody id="surgeryBody">
+          {% for name in surgeries %}
+          <tr>
+            <td><a href="{{ url_for('surgery_details', name=name) }}">{{ name }}</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('searchInput').addEventListener('input', function () {
+      const filter = this.value.toLowerCase();
+      const rows = document.querySelectorAll('#surgeryTable tbody tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ info.hospital_name }} - Details</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header>
+    <h1>{{ info.hospital_name }}</h1>
+  </header>
+  <div class="container">
+    <div class="section">
+      <p><strong>Contact:</strong> {{ info.contact }}</p>
+      <p><strong>Cost Range:</strong> ₹{{ info.cost_min }} - ₹{{ info.cost_max }}</p>
+      <p><strong>Scheme:</strong> {{ info.scheme_name or 'Not Covered' }}</p>
+      <p><strong>Reduced Cost:</strong> 
+        {% if info.reduced_cost %}
+          ₹{{ info.reduced_cost }}
+        {% else %}
+          N/A
+        {% endif %}
+      </p>
+      <a href="{{ url_for('surgery_details', procedure_id=request.args.get('procedure_id', 1)) }}">← Back to Surgery Details</a>
+    </div>
+  </div>
+</body>
+</html>

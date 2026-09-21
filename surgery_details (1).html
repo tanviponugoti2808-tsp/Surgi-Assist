@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ name }} - Surgery Details</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <style>
+    .hospital-link {
+      cursor: pointer;
+      color: blue;
+      text-decoration: underline;
+    }
+    .full-view {
+      display: none;
+      padding: 20px;
+    }
+    .back-button {
+      margin-top: 20px;
+      padding: 8px 16px;
+      background: #eee;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+    .filter-form {
+      margin-bottom: 20px;
+    }
+    .filter-form input,
+    .filter-form select {
+      padding: 6px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header><h1>{{ name }}</h1></header>
+
+  <div class="container">
+    <div id="main-table">
+
+      <!-- Filter Form -->
+      <form method="GET" class="filter-form">
+        <label>Min Cost:</label>
+        <input type="number" name="min_cost" placeholder="e.g. 50000" value="{{ request.args.get('min_cost', '') }}">
+
+        <label>Max Cost:</label>
+        <input type="number" name="max_cost" placeholder="e.g. 150000" value="{{ request.args.get('max_cost', '') }}">
+
+        <label>Scheme:</label>
+        <select name="scheme_filter">
+          <option value="" {% if request.args.get('scheme_filter') == '' %}selected{% endif %}>All</option>
+          <option value="covered" {% if request.args.get('scheme_filter') == 'covered' %}selected{% endif %}>Covered</option>
+          <option value="not_covered" {% if request.args.get('scheme_filter') == 'not_covered' %}selected{% endif %}>Not Covered</option>
+        </select>
+
+        <button type="submit">Apply Filter</button>
+      </form>
+
+      <div class="section">
+        <h2>Hospitals Offering This Surgery</h2>
+        {% if details %}
+        <table>
+          <thead>
+            <tr>
+              <th>Hospital</th>
+              <th>Contact</th>
+              <th>Cost</th>
+              <th>Schemes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in details %}
+            <tr>
+              <td>
+                <span class="hospital-link"
+                      onclick="showDetails('{{ row.hospital_name }}', '{{ row.address }}', '{{ row.website }}', '{{ row.location_link or 'N/A' }}')">
+                  {{ row.hospital_name }}
+                </span>
+              </td>
+              <td>{{ row.contact }}</td>
+              <td>₹{{ row.cost_min }} - ₹{{ row.cost_max }}</td>
+              <td>{{ row.scheme_name or 'Not Covered' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>No hospital data found for this surgery or the applied filters.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Hospital Detail View -->
+    <div id="detail-view" class="full-view">
+      <h2 id="d-hospital"></h2>
+
+      <p><strong>Address:</strong> <span id="d-address"></span></p>
+      <p><strong>Website:</strong> <a id="d-website" href="#" target="_blank"></a></p>
+      <p><strong>Location:</strong> 
+        <a id="d-location" href="#" target="_blank">Not Available</a>
+      </p>
+   <button class="back-button" style="color: black;" onclick="goBack()">← Back to Hospital List</button>
+    </div>
+  </div>
+
+  <script>
+    function showDetails(hospital, address, website, location_link) {
+      document.getElementById("main-table").style.display = "none";
+      document.getElementById("detail-view").style.display = "block";
+
+      document.getElementById("d-hospital").innerText = hospital;
+      document.getElementById("d-address").innerText = address;
+
+      // Website
+      if (website && website !== "N/A") {
+        document.getElementById("d-website").href = website;
+        document.getElementById("d-website").innerText = "Hospital Website";
+      } else {
+        document.getElementById("d-website").innerText = "Not Available";
+        document.getElementById("d-website").href = "#";
+      }
+
+      // Location
+      if (location_link && location_link !== "N/A") {
+        document.getElementById("d-location").href = location_link;
+        document.getElementById("d-location").innerText = "View Location on Map";
+      } else {
+        document.getElementById("d-location").innerText = "Location Not Available";
+        document.getElementById("d-location").href = "#";
+      }
+    }
+
+    function goBack() {
+      document.getElementById("detail-view").style.display = "none";
+      document.getElementById("main-table").style.display = "block";
+    }
+  </script>
+</body>
+</html>
